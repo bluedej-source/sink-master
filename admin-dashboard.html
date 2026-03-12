@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>싱크대명장 | 관리자 대시보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1410;
+  --bg2: #161c18;
+  --bg3: #1e2820;
+  --bg4: #243028;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --green: #4fa882;
+  --green2: #3d7a60;
+  --green-dim: rgba(79,168,130,0.12);
+  --gold: #c9a84c;
+  --red: #e05a5a;
+  --red-dim: rgba(224,90,90,0.12);
+  --blue: #5a9ae0;
+  --blue-dim: rgba(90,154,224,0.12);
+  --yellow: #e0b84c;
+  --yellow-dim: rgba(224,184,76,0.12);
+  --text: #f0f0ec;
+  --text2: #9aa09c;
+  --text3: #606860;
+  --sidebar-w: 240px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── LOGIN ── */
+#login-screen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.login-box {
+  width: 380px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 48px 40px;
+  animation: fadeIn 0.4s ease;
+}
+.login-logo {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  display: inline-block;
+  transition: opacity 0.2s;
+  line-height: 1.3;
+}
+.login-logo:hover { opacity: 0.72; }
+.login-logo span { color: var(--green); }
+.login-sub { font-size: 0.82rem; color: var(--text3); margin-bottom: 36px; }
+.login-label { font-size: 0.75rem; font-weight: 600; color: var(--text2); margin-bottom: 8px; letter-spacing: 0.5px; }
+.login-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.login-input:focus { border-color: var(--green); }
+.login-btn {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.login-btn:hover { background: var(--green2); }
+.login-err { font-size: 0.8rem; color: var(--red); margin-top: 10px; display: none; }
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  margin-top: -6px;
+}
+.remember-cb {
+  width: 15px; height: 15px;
+  accent-color: var(--green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.remember-label {
+  font-size: 0.8rem;
+  color: var(--text2);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-text {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: block;
+  text-align: left;
+  transition: opacity 0.2s;
+  line-height: 1.3;
+}
+.logo-text:hover { opacity: 0.75; }
+.logo-text span { color: var(--green); }
+.logo-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--green-dim);
+  color: var(--green);
+  padding: 2px 8px;
+  border-radius: 50px;
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+.sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+.nav-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 2px;
+  padding: 0 8px;
+  margin: 16px 0 8px;
+  text-transform: uppercase;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  user-select: none;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--green-dim); color: var(--green); font-weight: 700; }
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: var(--red);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 50px;
+  min-width: 20px;
+  text-align: center;
+}
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+.admin-info { display: flex; align-items: center; gap: 10px; }
+.admin-avatar {
+  width: 32px; height: 32px;
+  background: var(--green-dim);
+  border: 1px solid var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: var(--green);
+}
+.admin-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.admin-role { font-size: 0.72rem; color: var(--text3); }
+.logout-btn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(15,20,16,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.page-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 14px;
+  min-width: 220px;
+  transition: border-color 0.2s;
+}
+.search-box:focus-within { border-color: var(--green); }
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-family: 'Noto Sans KR', sans-serif; font-size: 0.85rem;
+  width: 100%;
+}
+.search-box input::placeholder { color: var(--text3); }
+.icon-btn {
+  width: 36px; height: 36px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s;
+  color: var(--text2);
+}
+.icon-btn:hover { background: var(--bg4); border-color: var(--border2); color: var(--text); }
+
+/* ── CONTENT ── */
+.content { padding: 28px; flex: 1; }
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--border2); }
+.stat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.stat-card-label { font-size: 0.78rem; color: var(--text2); font-weight: 500; }
+.stat-card-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+}
+.stat-card-num {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-card-delta { font-size: 0.75rem; }
+.delta-up { color: var(--green); }
+.delta-down { color: var(--red); }
+
+/* ── FILTER TOOLBAR ── */
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-tabs { display: flex; gap: 4px; }
+.filter-tab {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.15s;
+}
+.filter-tab:hover { background: var(--bg3); color: var(--text); }
+.filter-tab.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.filter-right { margin-left: auto; display: flex; gap: 8px; }
+.action-btn {
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+}
+.action-btn:hover { background: var(--bg3); color: var(--text); }
+.action-btn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+.action-btn.primary:hover { background: var(--green2); }
+
+/* ── TABLE ── */
+.table-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+thead tr { background: var(--bg3); border-bottom: 1px solid var(--border); }
+th {
+  padding: 12px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+th:hover { color: var(--text2); }
+th.sort-asc::after { content: ' ↑'; color: var(--green); }
+th.sort-desc::after { content: ' ↓'; color: var(--green); }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg3); }
+tbody tr.selected { background: var(--green-dim); }
+td {
+  padding: 14px 16px;
+  font-size: 0.86rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+.td-name { font-weight: 600; }
+.td-phone { color: var(--text2); font-size: 0.84rem; letter-spacing: 0.5px; }
+.td-region { color: var(--text2); font-size: 0.84rem; }
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.badge-new { background: var(--blue-dim); color: var(--blue); }
+.badge-new::before { background: var(--blue); }
+.badge-contact { background: var(--yellow-dim); color: var(--yellow); }
+.badge-contact::before { background: var(--yellow); }
+.badge-scheduled { background: rgba(201,168,76,0.12); color: var(--gold); }
+.badge-scheduled::before { background: var(--gold); }
+.badge-done { background: var(--green-dim); color: var(--green); }
+.badge-done::before { background: var(--green); }
+.badge-cancel { background: var(--red-dim); color: var(--red); }
+.badge-cancel::before { background: var(--red); }
+
+/* SERVICE TAG */
+.service-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: var(--bg4);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+/* CHECKBOX */
+.cb { accent-color: var(--green); width: 15px; height: 15px; cursor: pointer; }
+
+/* ACTIONS */
+.row-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.15s; }
+tbody tr:hover .row-actions { opacity: 1; }
+.row-btn {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.row-btn:hover { background: var(--bg4); color: var(--text); }
+.row-btn.view-btn:hover { border-color: var(--green); color: var(--green); }
+.row-btn.del-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* PAGINATION */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+.page-info { font-size: 0.78rem; color: var(--text3); }
+.page-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 30px; height: 30px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text2);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.page-btn:hover { background: var(--bg3); color: var(--text); }
+.page-btn.active { background: var(--green-dim); border-color: var(--green); color: var(--green); font-weight: 700; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px 0;
+  margin-bottom: 24px;
+}
+.modal-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+.modal-close {
+  width: 28px; height: 28px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.modal-close:hover { background: var(--red-dim); color: var(--red); border-color: var(--red); }
+.modal-body { padding: 0 28px 28px; }
+.modal-section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  margin-top: 24px;
+}
+.modal-section-title:first-child { margin-top: 0; }
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.info-item { }
+.info-label { font-size: 0.72rem; color: var(--text3); margin-bottom: 4px; font-weight: 500; }
+.info-value { font-size: 0.9rem; color: var(--text); font-weight: 500; }
+.info-value.highlight { color: var(--green); font-weight: 700; }
+.memo-textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  transition: border-color 0.2s;
+}
+.memo-textarea:focus { border-color: var(--green); }
+.status-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+.status-select:focus { border-color: var(--green); }
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 0 28px 28px;
+}
+.modal-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+}
+.modal-btn:hover { background: var(--bg4); color: var(--text); }
+.modal-btn.save { background: var(--green); border-color: var(--green); color: #fff; }
+.modal-btn.save:hover { background: var(--green2); }
+.modal-btn.del { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+.modal-btn.del:hover { background: var(--red); color: #fff; }
+
+/* ── ADD MODAL ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-col { display: flex; flex-direction: column; gap: 6px; }
+.form-col.full { grid-column: 1/-1; }
+.form-col label { font-size: 0.72rem; font-weight: 700; color: var(--text3); letter-spacing: 0.5px; }
+.form-field {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-field:focus { border-color: var(--green); }
+.form-field::placeholder { color: var(--text3); }
+select.form-field { cursor: pointer; }
+select.form-field option { background: var(--bg2); }
+
+/* ── CONFIRM MODAL ── */
+.confirm-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  width: 360px;
+  padding: 32px;
+  text-align: center;
+  animation: slideUp 0.25s ease;
+}
+.confirm-icon { font-size: 2.5rem; margin-bottom: 16px; }
+.confirm-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.confirm-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
+.confirm-btns { display: flex; gap: 10px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--text);
+  z-index: 9999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { font-size: 1rem; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.3; }
+.empty-text { font-size: 0.9rem; color: var(--text3); }
+
+/* ANIMATIONS */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+/* PHONE LINK */
+.phone-link { color: var(--blue); text-decoration: none; }
+.phone-link:hover { text-decoration: underline; }
+
+/* HIGHLIGHT */
+mark { background: rgba(79,168,130,0.25); color: var(--green); padding: 1px 2px; border-radius: 2px; }
+
+/* ── SIDEBAR TOGGLE & RESPONSIVE ── */
+.sidebar {
+  transition: transform 0.3s ease;
+}
+.main {
+  transition: margin-left 0.3s ease;
+}
+.sidebar.collapsed {
+  transform: translateX(-100%);
+}
+.main.expanded {
+  margin-left: 0;
+}
+
+.sidebar-toggle-btn {
+  position: absolute;
+  top: 80px;
+  right: -32px;
+  width: 32px;
+  height: 48px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 101;
+  transition: all 0.2s;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+}
+.sidebar-toggle-btn:hover {
+  background: var(--bg3);
+  color: #fff;
+}
+.sidebar-toggle-btn svg {
+  transition: transform 0.3s ease;
+}
+.sidebar.collapsed .sidebar-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 900px) {
+  .sidebar { 
+    transform: translateX(-100%); 
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar.mobile-open .sidebar-toggle-btn svg {
+    transform: rotate(180deg); /* Left pointing when open */
+  }
+  .sidebar:not(.mobile-open) .sidebar-toggle-btn svg {
+    transform: rotate(0deg); /* Right pointing when closed */
+  }
+  .main {
+    margin-left: 0;
+  }
+  .main.expanded {
+    margin-left: 0; 
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ──────── LOGIN ──────── -->
+<div id="login-screen">
+  <div class="login-box">
+    <button class="login-logo" onclick="goHome()" title="홈으로 이동">싱크대<span>명장</span></button>
+    <div class="login-sub">관리자 전용 대시보드</div>
+    <div class="login-label">아이디</div>
+    <input class="login-input" id="login-id" type="text" placeholder="아이디를 입력하세요" autocomplete="off">
+    <div class="login-label">비밀번호</div>
+    <input class="login-input" id="login-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="remember-row">
+      <input type="checkbox" class="remember-cb" id="remember-cb">
+      <label class="remember-label" for="remember-cb">아이디 기억하기</label>
+    </div>
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div class="login-err" id="login-err">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<!-- ──────── SIDEBAR ──────── -->
+<aside class="sidebar" id="sidebar">
+  <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="사이드바 열기/닫기">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  </button>
+  <div class="sidebar-logo">
+    <button class="logo-text" onclick="goHome()" title="홈으로 이동">싱크대<span>명장</span></button>
+    <div class="logo-badge">ADMIN</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">메인</div>
+    <div class="nav-item active" data-page="consultations" onclick="switchPage('consultations')">
+      <span class="nav-icon">📋</span> 상담 관리
+      <span class="nav-badge" id="new-count-badge">0</span>
+    </div>
+    <div class="nav-item" data-page="stats" onclick="switchPage('stats')">
+      <span class="nav-icon">📊</span> 통계 현황
+    </div>
+    <div class="nav-section-label">설정</div>
+    <div class="nav-item" onclick="showToast('준비 중인 기능입니다','ℹ️')">
+      <span class="nav-icon">⚙️</span> 설정
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar">관</div>
+      <div>
+        <div class="admin-name">관리자</div>
+        <div class="admin-role">Administrator</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ──────── MAIN ──────── -->
+<main class="main" id="main-app" style="display:none">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="page-title" id="page-title">상담 관리</div>
+    <div class="topbar-actions">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="이름, 연락처, 지역 검색..." id="search-input" oninput="applyFilters()">
+      </div>
+      <div class="icon-btn" onclick="loadFromStorage().then(()=>renderAll())" title="새로고침">🔄</div>
+      <div class="icon-btn" onclick="exportCSV()" title="CSV 내보내기">⬇️</div>
+      <div class="icon-btn" onclick="renderTable()" title="새로고침">🔄</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row"></div>
+
+    <!-- PAGE: CONSULTATIONS -->
+    <div id="page-consultations">
+      <!-- FILTER -->
+      <div class="filter-toolbar">
+        <div class="filter-tabs" id="filter-tabs">
+          <button class="filter-tab active" data-status="all" onclick="setFilter('all')">전체</button>
+          <button class="filter-tab" data-status="new" onclick="setFilter('new')">신규접수</button>
+          <button class="filter-tab" data-status="contact" onclick="setFilter('contact')">연락완료</button>
+          <button class="filter-tab" data-status="scheduled" onclick="setFilter('scheduled')">시공예정</button>
+          <button class="filter-tab" data-status="done" onclick="setFilter('done')">시공완료</button>
+          <button class="filter-tab" data-status="cancel" onclick="setFilter('cancel')">취소</button>
+        </div>
+        <div class="filter-right">
+          <button class="action-btn" onclick="bulkDelete()">🗑️ 선택 삭제</button>
+          <button class="action-btn primary" onclick="openAddModal()">＋ 수동 등록</button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px"><input type="checkbox" class="cb" id="cb-all" onchange="toggleAll(this)"></th>
+                <th onclick="sortBy('id')" data-col="id">#</th>
+                <th onclick="sortBy('name')" data-col="name">이름</th>
+                <th onclick="sortBy('phone')" data-col="phone">연락처</th>
+                <th onclick="sortBy('region')" data-col="region">지역</th>
+                <th onclick="sortBy('service')" data-col="service">서비스</th>
+                <th onclick="sortBy('status')" data-col="status">상태</th>
+                <th onclick="sortBy('createdAt')" data-col="createdAt">접수일시</th>
+                <th>메모</th>
+                <th style="width:140px">관리</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <div class="page-info" id="page-info"></div>
+          <div class="page-btns" id="page-btns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: STATS -->
+    <div id="page-stats" style="display:none">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:32px;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:12px">📊</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px">통계 현황</div>
+        <div style="font-size:0.85rem;color:var(--text3)">상담 데이터가 쌓이면 차트와 통계가 표시됩니다.</div>
+        <div id="stats-detail" style="margin-top:28px;text-align:left"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ──────── DETAIL MODAL ──────── -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">상담 상세 정보</div>
+      <div class="modal-close" onclick="closeModal('detail-modal')">✕</div>
+    </div>
+    <div class="modal-body" id="modal-body-detail"></div>
+    <div class="modal-footer">
+      <button class="modal-btn del" onclick="deleteFromModal()">삭제</button>
+      <button class="modal-btn" onclick="closeModal('detail-modal')">닫기</button>
+      <button class="modal-btn save" onclick="saveDetail()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── ADD MODAL ──────── -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">상담 수동 등록</div>
+      <div class="modal-close" onclick="closeModal('add-modal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-col">
+          <label>이름 *</label>
+          <input class="form-field" id="add-name" placeholder="홍길동">
+        </div>
+        <div class="form-col">
+          <label>연락처 *</label>
+          <input class="form-field" id="add-phone" placeholder="010-6581-2676">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col">
+          <label>지역</label>
+          <input class="form-field" id="add-region" placeholder="서울 마포구">
+        </div>
+        <div class="form-col">
+          <label>유입 경로</label>
+          <select class="form-field" id="add-source">
+            <option value="전화">전화</option>
+            <option value="카카오톡">카카오톡</option>
+            <option value="온라인폼" selected>온라인폼</option>
+            <option value="직접방문">직접방문</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col full">
+          <label>희망 서비스</label>
+          <select class="form-field" id="add-service">
+            <option value="상판 교체">싱크대 상판 교체</option>
+            <option value="수전 교체">수전 교체</option>
+            <option value="배수구·실링">배수구·실링 처리</option>
+            <option value="패키지 시공">패키지 종합 시공</option>
+            <option value="상담 후 결정">상담 후 결정</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-col full">
+          <label>메모</label>
+          <textarea class="form-field memo-textarea" id="add-memo" placeholder="특이사항 및 메모를 입력하세요."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn" onclick="closeModal('add-modal')">취소</button>
+      <button class="modal-btn save" onclick="submitAdd()">등록하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ──────── CONFIRM MODAL ──────── -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="confirm-modal">
+    <div class="confirm-icon" id="confirm-icon">⚠️</div>
+    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-desc" id="confirm-desc"></div>
+    <div class="confirm-btns">
+      <button class="modal-btn" style="flex:1" onclick="closeModal('confirm-modal')">취소</button>
+      <button class="modal-btn del" style="flex:1" id="confirm-ok-btn">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✅</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+const ADMIN = { id: 'ms731016', pw: 'kes2026!' };
+let allData = [];
+let filteredData = [];
+let currentFilter = 'all';
+let currentSearch = '';
+let sortCol = 'createdAt';
+let sortDir = 'desc';
+let currentPage = 1;
+const PAGE_SIZE = 10;
+let editingId = null;
+let selectedIds = new Set();
+
+const STATUS_MAP = {
+  new:       { label: '신규접수', cls: 'badge-new' },
+  contact:   { label: '연락완료', cls: 'badge-contact' },
+  scheduled: { label: '시공예정', cls: 'badge-scheduled' },
+  done:      { label: '시공완료', cls: 'badge-done' },
+  cancel:    { label: '취소',     cls: 'badge-cancel' },
+};
+
+// ═══════════════════════════════════════
+//  SEED DATA
+// ═══════════════════════════════════════
+function seedData() {
+  const services = ['상판 교체','수전 교체','패키지 시공','배수구·실링','상담 후 결정'];
+  const regions  = ['서울 마포구','경기 성남시','인천 연수구','부산 해운대구','대전 서구','서울 강남구','경기 수원시','서울 송파구'];
+  const sources  = ['온라인폼','전화','카카오톡','직접방문'];
+  const statuses = ['new','new','new','contact','contact','scheduled','done','done','cancel'];
+  const names    = ['김민수','이지은','박성호','최수진','정재원','한예슬','오동훈','류지현','임서연','강민준','윤소희','신동욱'];
+  const memos    = ['','이전에 한번 연락드림','오전 시간대 선호','','주차 공간 없음','빠른 시공 원함','완료 후 후기 작성','','취소 의사 표현',''];
+
+  const now = Date.now();
+  return Array.from({length: 18}, (_, i) => ({
+    id: 1000 + i + 1,
+    name: names[i % names.length],
+    phone: `010-${String(Math.floor(1000+Math.random()*9000))}-${String(Math.floor(1000+Math.random()*9000))}`,
+    region: regions[i % regions.length],
+    service: services[i % services.length],
+    source: sources[i % sources.length],
+    status: statuses[i % statuses.length],
+    memo: memos[i % memos.length],
+    createdAt: new Date(now - (18-i)*3600000*6 - Math.random()*3600000).toISOString(),
+  }));
+}
+
+// ═══════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════
+// ═══════════════════════════════════════
+//  SUPABASE CONFIG
+// ═══════════════════════════════════════
+const SUPABASE_URL = 'https://cxdyfmpukovdplsnkpno.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4ZHlmbXB1a292ZHBsc25rcG5vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMTA2NDAsImV4cCI6MjA4ODc4NjY0MH0.Wm9voqu9rpxS5ubLKLczH2mfrHsptgZmTLHvfHM2f8M';
+
+const SB_HEADERS = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`
+};
+
+async function sbFetch(path, options = {}) {
+  const { headers: extraHeaders, ...restOptions } = options;
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...restOptions,
+    headers: { ...SB_HEADERS, ...(extraHeaders || {}) }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  return restOptions.method && restOptions.method !== 'GET' ? res : res.json();
+}
+
+// ═══════════════════════════════════════
+//  STORAGE (Supabase)
+// ═══════════════════════════════════════
+function saveToStorage() { /* Supabase 사용 — 개별 작업에서 직접 호출 */ }
+
+async function loadFromStorage() {
+  try {
+    showLoading(true);
+    const data = await sbFetch('consultations?order=date.desc&limit=500');
+    allData = data.map(d => ({
+      id: d.id,
+      name: d.name,
+      phone: d.phone,
+      region: d.region,
+      service: d.service,
+      source: d.source,
+      status: d.status,
+      memo: d.memo || '',
+      createdAt: d.date || d.created_at
+    }));
+    showLoading(false);
+  } catch(e) {
+    console.error('데이터 로드 오류:', e);
+    showLoading(false);
+    showToast('데이터 로드 실패. 새로고침 해주세요.', '❌');
+  }
+}
+
+function showLoading(on) {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;font-size:1.2rem;color:#1a3a2e;font-weight:700;';
+    el.innerHTML = '⏳ 불러오는 중...';
+    document.body.appendChild(el);
+  }
+  el.style.display = on ? 'flex' : 'none';
+}
+
+// ═══════════════════════════════════════
+//  LOGIN / LOGOUT
+// ═══════════════════════════════════════
+function doLogin() {
+  const id = document.getElementById('login-id').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  const remember = document.getElementById('remember-cb').checked;
+  if (id === ADMIN.id && pw === ADMIN.pw) {
+    if (remember) {
+      try { localStorage.setItem('saved_admin_id', id); } catch(e) {}
+    } else {
+      try { localStorage.removeItem('saved_admin_id'); } catch(e) {}
+    }
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+    loadFromStorage().then(() => renderAll());
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+// Load saved ID on page start
+(function initRemember() {
+  try {
+    const saved = localStorage.getItem('saved_admin_id');
+    if (saved) {
+      document.getElementById('login-id').value = saved;
+      document.getElementById('remember-cb').checked = true;
+    }
+  } catch(e) {}
+})();
+function doLogout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-pw').value = '';
+}
+function goHome() {
+  const win = window.open('index.html', '_blank');
+  if (!win || win.closed || typeof win.closed === 'undefined') {
+    window.location.href = 'index.html';
+  }
+}
+
+// ═══════════════════════════════════════
+//  PAGE SWITCH
+// ═══════════════════════════════════════
+function switchPage(page) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  document.getElementById('page-consultations').style.display = page==='consultations' ? 'block' : 'none';
+  document.getElementById('page-stats').style.display = page==='stats' ? 'block' : 'none';
+  document.getElementById('page-title').textContent = page==='consultations' ? '상담 관리' : '통계 현황';
+  if (page==='stats') renderStats();
+}
+
+// ═══════════════════════════════════════
+//  RENDER ALL
+// ═══════════════════════════════════════
+function renderAll() {
+  renderStatCards();
+  applyFilters();
+  updateNewBadge();
+}
+
+function updateNewBadge() {
+  const c = allData.filter(d=>d.status==='new').length;
+  const el = document.getElementById('new-count-badge');
+  el.textContent = c;
+  el.style.display = c > 0 ? 'inline-block' : 'none';
+}
+
+// ═══════════════════════════════════════
+//  STAT CARDS
+// ═══════════════════════════════════════
+function renderStatCards() {
+  const total    = allData.length;
+  const newCount = allData.filter(d=>d.status==='new').length;
+  const done     = allData.filter(d=>d.status==='done').length;
+  const today    = allData.filter(d=>d.createdAt?.startsWith(new Date().toISOString().slice(0,10))).length;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">총 상담 건수</span>
+        <div class="stat-card-icon" style="background:var(--green-dim)">📋</div>
+      </div>
+      <div class="stat-card-num">${total}</div>
+      <div class="stat-card-delta delta-up">↑ 누적 전체</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">신규 접수</span>
+        <div class="stat-card-icon" style="background:var(--blue-dim)">🔔</div>
+      </div>
+      <div class="stat-card-num" style="color:var(--blue)">${newCount}</div>
+      <div class="stat-card-delta" style="color:var(--blue)">확인 필요</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">시공 완료</span>
+        <div class="stat-card-icon" style="background:var(--green-dim)">✅</div>
+      </div>
+      <div class="stat-card-num" style="color:var(--green)">${done}</div>
+      <div class="stat-card-delta delta-up">전환율 ${total?Math.round(done/total*100):0}%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-header">
+        <span class="stat-card-label">오늘 접수</span>
+        <div class="stat-card-icon" style="background:var(--yellow-dim)">📅</div>
+      </div>
+      <div class="stat-card-num" style="color:var(--yellow)">${today}</div>
+      <div class="stat-card-delta" style="color:var(--yellow)">${new Date().toLocaleDateString('ko-KR')}</div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════
+//  FILTER & SORT
+// ═══════════════════════════════════════
+function setFilter(status) {
+  currentFilter = status;
+  currentPage = 1;
+  document.querySelectorAll('.filter-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.status === status);
+  });
+  applyFilters();
+}
+
+function applyFilters() {
+  currentSearch = document.getElementById('search-input').value.toLowerCase();
+  filteredData = allData.filter(d => {
+    const matchStatus = currentFilter==='all' || d.status===currentFilter;
+    const matchSearch = !currentSearch ||
+      d.name.toLowerCase().includes(currentSearch) ||
+      d.phone.includes(currentSearch) ||
+      (d.region||'').toLowerCase().includes(currentSearch) ||
+      (d.service||'').toLowerCase().includes(currentSearch);
+    return matchStatus && matchSearch;
+  });
+  sortData();
+  renderTable();
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortDir = sortDir==='asc'?'desc':'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.dataset.col === sortCol) th.classList.add('sort-'+sortDir);
+  });
+  sortData();
+  renderTable();
+}
+
+function sortData() {
+  filteredData.sort((a,b) => {
+    let av = a[sortCol]??'', bv = b[sortCol]??'';
+    if (sortCol==='id') { av=Number(av); bv=Number(bv); }
+    if (av < bv) return sortDir==='asc'?-1:1;
+    if (av > bv) return sortDir==='asc'?1:-1;
+    return 0;
+  });
+}
+
+// ═══════════════════════════════════════
+//  TABLE RENDER
+// ═══════════════════════════════════════
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const total = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(total/PAGE_SIZE));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage-1)*PAGE_SIZE;
+  const slice = filteredData.slice(start, start+PAGE_SIZE);
+
+  if (slice.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-text">표시할 데이터가 없습니다.</div>
+    </div></td></tr>`;
+  } else {
+    const search = currentSearch;
+    tbody.innerHTML = slice.map(d => {
+      const st = STATUS_MAP[d.status]||STATUS_MAP.new;
+      const dt = d.createdAt ? new Date(d.createdAt).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '-';
+      const hl = t => !search ? t : t.replace(new RegExp(search,'gi'), m=>`<mark>${m}</mark>`);
+      return `
+      <tr onclick="openDetail('${d.id}')" class="${selectedIds.has(d.id)?'selected':''}">
+        <td onclick="event.stopPropagation()">
+          <input type="checkbox" class="cb" onchange="toggleSelect('${d.id}',this)" ${selectedIds.has(d.id)?'checked':''}>
+        </td>
+        <td style="color:var(--text3);font-size:0.78rem">#${d.id}</td>
+        <td class="td-name">${hl(d.name)}</td>
+        <td class="td-phone"><a class="phone-link" href="tel:${d.phone}" onclick="event.stopPropagation()">${hl(d.phone)}</a></td>
+        <td class="td-region">${hl(d.region||'-')}</td>
+        <td><span class="service-tag">${d.service||'-'}</span></td>
+        <td><span class="status-badge ${st.cls}">${st.label}</span></td>
+        <td style="color:var(--text3);font-size:0.8rem;white-space:nowrap">${dt}</td>
+        <td style="color:var(--text2);font-size:0.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.memo||'-'}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="row-actions">
+            <button class="row-btn view-btn" onclick="openDetail('${d.id}')">상세</button>
+            <button class="row-btn" onclick="quickStatus('${d.id}')">상태변경</button>
+            <button class="row-btn del-btn" onclick="confirmDelete('${d.id}')">삭제</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // pagination
+  document.getElementById('page-info').textContent = `총 ${total}건 중 ${Math.min(start+1,total)}–${Math.min(start+PAGE_SIZE,total)}건`;
+  const pbtns = document.getElementById('page-btns');
+  pbtns.innerHTML = '';
+  const addPBtn = (label, page, active=false, disabled=false) => {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (active?' active':'');
+    b.textContent = label;
+    b.disabled = disabled;
+    if (!disabled) b.onclick = () => { currentPage=page; renderTable(); };
+    pbtns.appendChild(b);
+  };
+  addPBtn('‹', currentPage-1, false, currentPage<=1);
+  for (let i=1;i<=totalPages;i++) {
+    if (totalPages>7 && i>2 && i<totalPages-1 && Math.abs(i-currentPage)>1) {
+      if (i===3||i===totalPages-2) { const s=document.createElement('span'); s.textContent='…'; s.style.cssText='color:var(--text3);padding:0 4px;font-size:0.8rem;align-self:center'; pbtns.appendChild(s); }
+      continue;
+    }
+    addPBtn(i, i, i===currentPage);
+  }
+  addPBtn('›', currentPage+1, false, currentPage>=totalPages);
+}
+
+// ═══════════════════════════════════════
+//  SELECT
+// ═══════════════════════════════════════
+function toggleSelect(id, cb) {
+  if (cb.checked) selectedIds.add(id); else selectedIds.delete(id);
+  document.getElementById('cb-all').checked = false;
+}
+function toggleAll(cb) {
+  const ids = filteredData.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE).map(d=>d.id);
+  if (cb.checked) ids.forEach(id=>selectedIds.add(id)); else ids.forEach(id=>selectedIds.delete(id));
+  renderTable();
+}
+
+// ═══════════════════════════════════════
+//  DETAIL MODAL
+// ═══════════════════════════════════════
+function openDetail(id) {
+  editingId = id;
+  const d = allData.find(x=>x.id===id);
+  if (!d) return;
+  const st = STATUS_MAP[d.status]||STATUS_MAP.new;
+  const dt = d.createdAt ? new Date(d.createdAt).toLocaleString('ko-KR') : '-';
+
+  document.getElementById('modal-body-detail').innerHTML = `
+    <div class="modal-section-title">기본 정보</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">이름</div><div class="info-value">${d.name}</div></div>
+      <div class="info-item"><div class="info-label">연락처</div><div class="info-value"><a class="phone-link" href="tel:${d.phone}">${d.phone}</a></div></div>
+      <div class="info-item"><div class="info-label">지역</div><div class="info-value">${d.region||'-'}</div></div>
+      <div class="info-item"><div class="info-label">유입 경로</div><div class="info-value">${d.source||'-'}</div></div>
+      <div class="info-item"><div class="info-label">희망 서비스</div><div class="info-value highlight">${d.service||'-'}</div></div>
+      <div class="info-item"><div class="info-label">접수 일시</div><div class="info-value">${dt}</div></div>
+    </div>
+    <div class="modal-section-title" style="margin-top:20px">상태 변경</div>
+    <select class="status-select" id="detail-status">
+      ${Object.entries(STATUS_MAP).map(([k,v])=>`<option value="${k}" ${d.status===k?'selected':''}>${v.label}</option>`).join('')}
+    </select>
+    <div class="modal-section-title" style="margin-top:20px">메모</div>
+    <textarea class="memo-textarea" id="detail-memo" placeholder="메모를 입력하세요...">${d.memo||''}</textarea>
+  `;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+async function saveDetail() {
+  const d = allData.find(x=>x.id===editingId);
+  if (!d) return;
+  d.status = document.getElementById('detail-status').value;
+  d.memo   = document.getElementById('detail-memo').value;
+  try {
+    await sbFetch(`consultations?id=eq.${encodeURIComponent(d.id)}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: d.status, memo: d.memo })
+    });
+    closeModal('detail-modal');
+    renderAll();
+    showToast('저장되었습니다','✅');
+  } catch(e) {
+    showToast('저장 실패: ' + e.message, '❌');
+  }
+}
+
+function deleteFromModal() {
+  confirmDelete(editingId, () => closeModal('detail-modal'));
+}
+
+// ═══════════════════════════════════════
+//  QUICK STATUS
+// ═══════════════════════════════════════
+const STATUS_FLOW = ['new','contact','scheduled','done'];
+async function quickStatus(id) {
+  const d = allData.find(x=>x.id===id);
+  if (!d) return;
+  const idx = STATUS_FLOW.indexOf(d.status);
+  d.status = STATUS_FLOW[(idx+1) % STATUS_FLOW.length];
+  try {
+    await sbFetch(`consultations?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: d.status })
+    });
+    renderAll();
+    showToast(`상태 변경: ${STATUS_MAP[d.status].label}`,'🔄');
+  } catch(e) {
+    showToast('상태 변경 실패', '❌');
+  }
+}
+
+// ═══════════════════════════════════════
+//  DELETE
+// ═══════════════════════════════════════
+function confirmDelete(id, cb) {
+  const d = allData.find(x=>x.id===id);
+  if (!d) return;
+  showConfirm('삭제하시겠습니까?', `${d.name}님의 상담 데이터가 영구 삭제됩니다.`, async () => {
+    try {
+      await sbFetch(`consultations?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+      allData = allData.filter(x=>x.id!==id);
+      selectedIds.delete(id);
+      renderAll();
+      showToast('삭제되었습니다','🗑️');
+      if (cb) cb();
+    } catch(e) {
+      showToast('삭제 실패', '❌');
+    }
+  });
+}
+
+function bulkDelete() {
+  if (selectedIds.size===0) { showToast('선택된 항목이 없습니다','ℹ️'); return; }
+  showConfirm(`${selectedIds.size}건 삭제`, '선택한 상담 데이터를 모두 삭제합니다. 복구할 수 없습니다.', async () => {
+    try {
+      const ids = [...selectedIds].map(id => `id=eq.${encodeURIComponent(id)}`).join(',');
+      await sbFetch(`consultations?or=(${ids})`, { method: 'DELETE' });
+      allData = allData.filter(d=>!selectedIds.has(d.id));
+      selectedIds.clear();
+      renderAll();
+      showToast('삭제되었습니다','🗑️');
+    } catch(e) {
+      showToast('삭제 실패', '❌');
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+//  ADD
+// ═══════════════════════════════════════
+function openAddModal() {
+  ['add-name','add-phone','add-region','add-memo'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('add-modal').classList.add('open');
+}
+
+async function submitAdd() {
+  const name  = document.getElementById('add-name').value.trim();
+  const phone = document.getElementById('add-phone').value.trim();
+  if (!name||!phone) { showToast('이름과 연락처는 필수입니다','⚠️'); return; }
+  const newItem = {
+    id: `manual_${Date.now()}`,
+    name,
+    phone,
+    region:  document.getElementById('add-region').value.trim(),
+    service: document.getElementById('add-service').value,
+    source:  document.getElementById('add-source').value,
+    status: 'new',
+    memo: document.getElementById('add-memo').value.trim(),
+    date: new Date().toISOString()
+  };
+  try {
+    await sbFetch('consultations', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify(newItem)
+    });
+    allData.unshift({ ...newItem, createdAt: newItem.date });
+    closeModal('add-modal');
+    renderAll();
+    showToast(`${name}님 등록 완료`,'✅');
+  } catch(e) {
+    showToast('등록 실패: ' + e.message, '❌');
+  }
+}
+
+// ═══════════════════════════════════════
+//  CSV EXPORT
+// ═══════════════════════════════════════
+function exportCSV() {
+  const headers = ['ID','이름','연락처','지역','서비스','상태','접수일시','유입경로','메모'];
+  const rows = filteredData.map(d=>[
+    d.id, d.name, d.phone, d.region||'', d.service||'',
+    STATUS_MAP[d.status]?.label||d.status,
+    d.createdAt ? new Date(d.createdAt).toLocaleString('ko-KR') : '',
+    d.source||'', (d.memo||'').replace(/,/g,' ')
+  ]);
+  const csv = [headers,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`상담목록_${new Date().toLocaleDateString('ko-KR')}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV 파일이 다운로드됩니다','⬇️');
+}
+
+// ═══════════════════════════════════════
+//  STATS PAGE
+// ═══════════════════════════════════════
+function renderStats() {
+  const total = allData.length;
+  const byStatus = {};
+  const byService = {};
+  const bySource = {};
+  allData.forEach(d => {
+    byStatus[d.status] = (byStatus[d.status]||0)+1;
+    byService[d.service||'기타'] = (byService[d.service||'기타']||0)+1;
+    bySource[d.source||'기타'] = (bySource[d.source||'기타']||0)+1;
+  });
+  const bar = (label,count,max,color='var(--green)') => `
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:0.82rem;color:var(--text2)">${label}</span>
+        <span style="font-size:0.82rem;font-weight:700;color:var(--text)">${count}건 (${total?Math.round(count/total*100):0}%)</span>
+      </div>
+      <div style="background:var(--bg4);border-radius:3px;height:6px;overflow:hidden">
+        <div style="width:${max?count/max*100:0}%;height:100%;background:${color};border-radius:3px;transition:width 0.5s ease"></div>
+      </div>
+    </div>`;
+
+  const statusMax = Math.max(...Object.values(byStatus),1);
+  const serviceMax = Math.max(...Object.values(byService),1);
+  document.getElementById('stats-detail').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text3);letter-spacing:2px;margin-bottom:16px">상태별 현황</div>
+        ${Object.entries(STATUS_MAP).map(([k,v])=>bar(v.label,byStatus[k]||0,statusMax)).join('')}
+      </div>
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text3);letter-spacing:2px;margin-bottom:16px">서비스별 현황</div>
+        ${Object.entries(byService).sort((a,b)=>b[1]-a[1]).map(([k,v])=>bar(k,v,serviceMax,'var(--gold)')).join('')}
+      </div>
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:var(--text3);letter-spacing:2px;margin-bottom:16px">유입 경로</div>
+        ${Object.entries(bySource).sort((a,b)=>b[1]-a[1]).map(([k,v])=>bar(k,v,Math.max(...Object.values(bySource),1),'var(--blue)')).join('')}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
+});
+
+function showConfirm(title, desc, onOk) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-desc').textContent = desc;
+  const btn = document.getElementById('confirm-ok-btn');
+  btn.onclick = () => { closeModal('confirm-modal'); onOk(); };
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg, icon='✅') {
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════
+//  KEYBOARD & SIDEBAR TOGGLE
+// ═══════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+  }
+});
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main-app');
+  
+  if (window.innerWidth <= 900) {
+    sidebar.classList.toggle('mobile-open');
+  } else {
+    sidebar.classList.toggle('collapsed');
+    main.classList.toggle('expanded');
+  }
+}
+</script>
+</body>
+</html>
