@@ -1305,7 +1305,7 @@ function renderTable() {
         <td onclick="event.stopPropagation()">
           <input type="checkbox" class="cb" onchange="toggleSelect('${d.id}',this)" ${selectedIds.has(d.id)?'checked':''}>
         </td>
-        <td style="color:var(--text3);font-size:0.78rem">#${d.id}</td>
+        <td style="color:var(--text3);font-size:0.78rem">#${String(d.id).replace('_', '_<br>')}</td>
         <td class="td-name">${hl(d.name)}</td>
         <td class="td-phone"><a class="phone-link" href="tel:${d.phone}" onclick="event.stopPropagation()">${hl(d.phone)}</a></td>
         <td class="td-region">${hl(d.region||'-')}</td>
