@@ -379,9 +379,12 @@ nav {
 }
 @media (max-width: 480px) {
   .service-grid { grid-template-columns: 1fr; }
-  .pay-method-grid { grid-template-columns: 1fr; }
 }
 </style>
+<!-- 포트원(iamport) JS SDK -->
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<!-- 다음 우편번호 서비스 -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
 
@@ -428,10 +431,14 @@ nav {
           <div class="form-row">
             <div class="form-col">
               <label class="form-label">시공 주소 <span class="req">*</span></label>
-              <input class="form-input" id="f-addr" type="text" placeholder="서울 마포구 ○○동">
+              <div style="display:flex;gap:6px;">
+                <input class="form-input" id="f-addr" type="text" placeholder="주소를 검색해주세요" readonly onclick="execDaumPostcode()" style="cursor:pointer;flex:1;">
+                <button type="button" onclick="execDaumPostcode()" style="padding:0 14px;background:var(--green-deep);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;white-space:nowrap;">검색</button>
+              </div>
+              <input class="form-input" id="f-addr-detail" type="text" placeholder="상세 주소를 입력해주세요" style="margin-top:6px;">
             </div>
             <div class="form-col">
-              <label class="form-label">희망 시공일</label>
+              <label class="form-label">시공날짜</label>
               <input class="form-input" id="f-date" type="date">
             </div>
           </div>
@@ -720,19 +727,52 @@ function toggleSubmit() {
 async function submitPayment() {
   const name  = document.getElementById('f-name').value.trim();
   const phone = document.getElementById('f-phone').value.trim();
-  const addr  = document.getElementById('f-addr').value.trim();
+  const addrBase = document.getElementById('f-addr').value.trim();
+  const addrDetail = document.getElementById('f-addr-detail').value.trim();
+  const addr = addrBase + (addrDetail ? ' ' + addrDetail : '');
+  
   if (!name)  { showToast('⚠️ 이름을 입력해주세요'); return; }
   if (!phone) { showToast('⚠️ 연락처를 입력해주세요'); return; }
-  if (!addr)  { showToast('⚠️ 시공 주소를 입력해주세요'); return; }
+  if (!addrBase) { showToast('⚠️ 시공 주소를 검색해주세요'); return; }
 
   const service = document.querySelector('input[name="service"]:checked')?.value || '-';
   const method  = document.querySelector('input[name="paymethod"]:checked')?.value || '-';
   const date    = document.getElementById('f-date').value || '협의 후 결정';
-  const price   = parseInt(document.getElementById('service-price-input')?.value || 0);
+  const price   = parseInt(document.getElementById('service-price-input')?.value || 0) + parseInt(document.getElementById('travel-fee')?.value || 0);
 
   const btn = document.getElementById('submit-btn');
-  btn.textContent = '⏳ 전송 중...'; btn.disabled = true;
+  btn.textContent = '⏳ 결제 진행 중...'; btn.disabled = true;
 
+  if (method === '카드' || method === '카카오페이' || method === '네이버페이') {
+    let pgOption = 'html5_inicis'; 
+    if (method === '카카오페이') pgOption = 'kakaopay';
+    
+    IMP.request_pay({
+      pg: pgOption,
+      pay_method: 'card',
+      merchant_uid: `payment_${Date.now()}`,
+      name: service,
+      amount: price > 0 ? price : 1000, // 아임포트 최소 결제금액은 100원
+      buyer_email: 'test@portone.io',
+      buyer_name: name,
+      buyer_tel: phone,
+      buyer_addr: addr,
+    }, async function (rsp) {
+      if (rsp.success) {
+        await saveToSupabaseAndShowSuccess(name, phone, addr, service, method, date, price, btn);
+      } else {
+        showToast('❌ 결제 실패: ' + rsp.error_msg);
+        btn.textContent = '결제 신청하기'; 
+        btn.disabled = false;
+      }
+    });
+  } else {
+    // 현장결제, 계좌이체 등
+    await saveToSupabaseAndShowSuccess(name, phone, addr, service, method, date, price, btn);
+  }
+}
+
+async function saveToSupabaseAndShowSuccess(name, phone, addr, service, method, date, price, btn) {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/consultations`, {
       method: 'POST',
@@ -748,16 +788,16 @@ async function submitPayment() {
         region: addr,
         service,
         source: '결제페이지',
-        status: 'new',
-        memo: `결제수단: ${method} | 희망일: ${date}`,
+        status: (method === '카드' || method === '카카오페이') ? 'paid' : 'new',
+        memo: `결제수단: ${method} | 시공날짜: ${date}`,
         date: new Date().toISOString()
       })
     });
     if (!res.ok) throw new Error(await res.text());
   } catch(e) {
     console.error(e);
-    showToast('❌ 오류가 발생했습니다. 전화로 문의해주세요.');
-    btn.textContent = '예약 신청하기'; btn.disabled = false;
+    showToast('❌ 데이터 저장 중 오류가 발생했습니다. 전화로 문의해주세요.');
+    btn.textContent = '결제 신청하기'; btn.disabled = false;
     return;
   }
 
@@ -765,14 +805,20 @@ async function submitPayment() {
   document.getElementById('pay-form-wrap').style.display = 'none';
   const ss = document.getElementById('success-screen');
   ss.classList.add('show');
+  
+  let priceHtml = `<div class="success-row"><span class="sr-label">예상 금액</span><span class="sr-val" style="color:var(--green-accent)">${price.toLocaleString()}원~</span></div>`;
+  if (method === '카드' || method === '카카오페이' || method === '네이버페이') {
+     priceHtml = `<div class="success-row"><span class="sr-label">결제 금액</span><span class="sr-val" style="color:var(--green-accent)">${price.toLocaleString()}원 (결제완료)</span></div>`;
+  }
+  
   document.getElementById('success-detail').innerHTML = `
     <div class="success-row"><span class="sr-label">예약자</span><span class="sr-val">${name}</span></div>
     <div class="success-row"><span class="sr-label">연락처</span><span class="sr-val">${phone}</span></div>
     <div class="success-row"><span class="sr-label">시공 주소</span><span class="sr-val">${addr}</span></div>
     <div class="success-row"><span class="sr-label">서비스</span><span class="sr-val">${service}</span></div>
-    <div class="success-row"><span class="sr-label">희망 시공일</span><span class="sr-val">${date}</span></div>
+    <div class="success-row"><span class="sr-label">시공날짜</span><span class="sr-val">${date}</span></div>
     <div class="success-row"><span class="sr-label">결제 수단</span><span class="sr-val">${method}</span></div>
-    <div class="success-row"><span class="sr-label">예상 금액</span><span class="sr-val" style="color:var(--green-accent)">${price.toLocaleString()}원~</span></div>
+    ${priceHtml}
   `;
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -787,7 +833,20 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
+// ── ADDRESS SEARCH ──
+function execDaumPostcode() {
+  new daum.Postcode({
+    oncomplete: function(data) {
+      let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+      document.getElementById('f-addr').value = addr;
+      document.getElementById('f-addr-detail').focus();
+    }
+  }).open();
+}
+
 // ── INIT ──
+const IMP = window.IMP;
+IMP.init("imp14397622"); // 포트원(iamport) 공개 테스트 가맹점 식별코드
 updateSummary();
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('f-date').min = today;
